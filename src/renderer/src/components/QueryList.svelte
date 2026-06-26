@@ -302,6 +302,7 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     overflow: hidden;
+    flex-shrink: 0;
   }
 
   .category-header {
