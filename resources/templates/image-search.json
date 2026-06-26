@@ -1,0 +1,38 @@
+[
+  {
+    "id": "google-images-name",
+    "platform": "google-images",
+    "platformLabel": "Google Görseller",
+    "category": "media",
+    "categoryLabel": "Görsel ve Medya",
+    "priority": "medium",
+    "label": "Google Görseller",
+    "description": "Google Görseller'de isim araması",
+    "urlTemplate": "https://www.google.com/search?q={{name}}&tbm=isch",
+    "requiredFields": ["name"]
+  },
+  {
+    "id": "yandex-images-name",
+    "platform": "yandex-images",
+    "platformLabel": "Yandex Görseller",
+    "category": "media",
+    "categoryLabel": "Görsel ve Medya",
+    "priority": "medium",
+    "label": "Yandex Görseller",
+    "description": "Yandex Görseller'de isim araması — reverse image için güçlü",
+    "urlTemplate": "https://yandex.com/images/search?text={{name}}",
+    "requiredFields": ["name"]
+  },
+  {
+    "id": "tineye-reverse",
+    "platform": "tineye",
+    "platformLabel": "TinEye",
+    "category": "media",
+    "categoryLabel": "Görsel ve Medya",
+    "priority": "low",
+    "label": "TinEye reverse search",
+    "description": "TinEye ile görsel kaynak araması (URL ile)",
+    "urlTemplate": "https://tineye.com/",
+    "requiredFields": []
+  }
+]

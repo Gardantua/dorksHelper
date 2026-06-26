@@ -1,0 +1,87 @@
+[
+  {
+    "id": "github-username",
+    "platform": "github",
+    "platformLabel": "GitHub",
+    "category": "technical",
+    "categoryLabel": "Teknik",
+    "priority": "high",
+    "label": "GitHub profili",
+    "description": "GitHub profil sayfasını direkt aç",
+    "urlTemplate": "https://github.com/{{username}}",
+    "requiredFields": ["username"]
+  },
+  {
+    "id": "github-email-search",
+    "platform": "github",
+    "platformLabel": "GitHub",
+    "category": "technical",
+    "categoryLabel": "Teknik",
+    "priority": "high",
+    "label": "Email commit araması",
+    "description": "GitHub commit geçmişinde email ara",
+    "urlTemplate": "https://github.com/search?q={{email}}&type=commits",
+    "requiredFields": ["email"]
+  },
+  {
+    "id": "github-name-search",
+    "platform": "github",
+    "platformLabel": "GitHub",
+    "category": "technical",
+    "categoryLabel": "Teknik",
+    "priority": "medium",
+    "label": "İsim araması",
+    "description": "GitHub'da isim araması",
+    "urlTemplate": "https://github.com/search?q={{name}}&type=users",
+    "requiredFields": ["name"]
+  },
+  {
+    "id": "github-google-email-dork",
+    "platform": "google",
+    "platformLabel": "Google → GitHub",
+    "category": "credentials",
+    "categoryLabel": "Kimlik Bilgisi Sızıntısı",
+    "priority": "high",
+    "label": "GitHub email sızıntısı",
+    "description": "GitHub'da email adresinin geçtiği kod/commit'leri bul",
+    "template": "\"{{email}}\" site:github.com",
+    "baseUrl": "https://www.google.com/search?q=",
+    "requiredFields": ["email"]
+  },
+  {
+    "id": "shodan-name",
+    "platform": "shodan",
+    "platformLabel": "Shodan",
+    "category": "technical",
+    "categoryLabel": "Teknik",
+    "priority": "medium",
+    "label": "Shodan araması",
+    "description": "Shodan'da isim/kurum araması",
+    "urlTemplate": "https://www.shodan.io/search?query={{name}}",
+    "requiredFields": ["name"]
+  },
+  {
+    "id": "crtsh-domain",
+    "platform": "crtsh",
+    "platformLabel": "crt.sh",
+    "category": "technical",
+    "categoryLabel": "Teknik",
+    "priority": "high",
+    "label": "SSL sertifikaları",
+    "description": "Domain için SSL sertifika geçmişi ve subdomain keşfi",
+    "urlTemplate": "https://crt.sh/?q={{domain}}",
+    "requiredFields": ["domain"]
+  },
+  {
+    "id": "gitlab-username",
+    "platform": "gitlab",
+    "platformLabel": "GitLab",
+    "category": "technical",
+    "categoryLabel": "Teknik",
+    "priority": "low",
+    "label": "GitLab profili",
+    "description": "GitLab profil sayfasını direkt aç",
+    "urlTemplate": "https://gitlab.com/{{username}}",
+    "requiredFields": ["username"]
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "wayback-name",
+    "platform": "archive",
+    "platformLabel": "Wayback Machine",
+    "category": "archive",
+    "categoryLabel": "Arşiv ve Tarihsel",
+    "priority": "medium",
+    "label": "İsim araması",
+    "description": "Silinmiş içeriklerde isim araması",
+    "urlTemplate": "https://web.archive.org/web/*/{{name}}",
+    "requiredFields": ["name"]
+  },
+  {
+    "id": "wayback-domain",
+    "platform": "archive",
+    "platformLabel": "Wayback Machine",
+    "category": "archive",
+    "categoryLabel": "Arşiv ve Tarihsel",
+    "priority": "medium",
+    "label": "Domain arşivi",
+    "description": "Domain'in geçmişini gör",
+    "urlTemplate": "https://web.archive.org/web/*/{{domain}}",
+    "requiredFields": ["domain"]
+  },
+  {
+    "id": "google-cache-name",
+    "platform": "google",
+    "platformLabel": "Google Cache",
+    "category": "archive",
+    "categoryLabel": "Arşiv ve Tarihsel",
+    "priority": "low",
+    "label": "Google önbellek",
+    "description": "Google önbelleğinde isim araması",
+    "template": "cache:\"{{name}}\"",
+    "baseUrl": "https://www.google.com/search?q=",
+    "requiredFields": ["name"]
+  },
+  {
+    "id": "google-archive-name",
+    "platform": "google",
+    "platformLabel": "Google → Archive.org",
+    "category": "archive",
+    "categoryLabel": "Arşiv ve Tarihsel",
+    "priority": "medium",
+    "label": "Archive.org araması",
+    "description": "Archive.org'da isim araması",
+    "template": "\"{{name}}\" site:archive.org",
+    "baseUrl": "https://www.google.com/search?q=",
+    "requiredFields": ["name"]
+  }
+]

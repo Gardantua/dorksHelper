@@ -1,0 +1,39 @@
+{
+  "name": "dorks-helper",
+  "version": "0.1.0",
+  "description": "OSINT Dorking ve Soruşturma Aracı",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite dev",
+    "dist": "electron-vite build && electron-builder"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.3.0",
+    "svelte": "^4.2.18",
+    "vite": "^5.3.4"
+  },
+  "build": {
+    "appId": "com.osint.dorkshelper",
+    "productName": "dorksHelper",
+    "directories": {
+      "output": "dist"
+    },
+    "extraResources": [
+      {
+        "from": "resources",
+        "to": "resources"
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

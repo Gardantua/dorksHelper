@@ -1,0 +1,51 @@
+[
+  {
+    "id": "pastebin-email",
+    "platform": "pastebin",
+    "platformLabel": "Pastebin",
+    "category": "credentials",
+    "categoryLabel": "Kimlik Bilgisi Sızıntısı",
+    "priority": "high",
+    "label": "Email sızıntısı",
+    "description": "Email adresinin Pastebin'de geçip geçmediğini kontrol et",
+    "urlTemplate": "https://pastebin.com/search?q={{email}}",
+    "requiredFields": ["email"]
+  },
+  {
+    "id": "pastebin-username",
+    "platform": "pastebin",
+    "platformLabel": "Pastebin",
+    "category": "credentials",
+    "categoryLabel": "Kimlik Bilgisi Sızıntısı",
+    "priority": "medium",
+    "label": "Kullanıcı adı sızıntısı",
+    "description": "Kullanıcı adının Pastebin'de geçip geçmediğini kontrol et",
+    "urlTemplate": "https://pastebin.com/search?q={{username}}",
+    "requiredFields": ["username"]
+  },
+  {
+    "id": "google-email-leaks",
+    "platform": "google",
+    "platformLabel": "Google",
+    "category": "credentials",
+    "categoryLabel": "Kimlik Bilgisi Sızıntısı",
+    "priority": "high",
+    "label": "Email — sızıntı siteleri",
+    "description": "Email adresini bilinen sızıntı sitelerinde ara",
+    "template": "\"{{email}}\" site:pastebin.com OR site:ghostbin.com OR site:hastebin.com OR site:justpaste.it",
+    "baseUrl": "https://www.google.com/search?q=",
+    "requiredFields": ["email"]
+  },
+  {
+    "id": "haveibeenpwned-email",
+    "platform": "hibp",
+    "platformLabel": "HaveIBeenPwned",
+    "category": "credentials",
+    "categoryLabel": "Kimlik Bilgisi Sızıntısı",
+    "priority": "high",
+    "label": "HIBP email kontrolü",
+    "description": "Email adresinin bilinen ihlallerde yer alıp almadığını kontrol et",
+    "urlTemplate": "https://haveibeenpwned.com/account/{{email}}",
+    "requiredFields": ["email"]
+  }
+]
