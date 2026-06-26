@@ -1,6 +1,7 @@
 import { ipcMain, shell, dialog } from 'electron'
 import { loadProfiles, saveProfiles, loadSession, saveSession, loadSettings, saveSettings } from './core/storage'
 import { generateQueries } from './core/dork-engine'
+import { writeProfileNote, writeFindingNote } from './core/obsidian'
 
 export function registerIpcHandlers() {
   ipcMain.handle('profiles:load', () => loadProfiles())
@@ -19,5 +20,13 @@ export function registerIpcHandlers() {
   ipcMain.handle('dialog:select-folder', async (_e) => {
     const result = await dialog.showOpenDialog({ properties: ['openDirectory'] })
     return result.canceled ? null : result.filePaths[0]
+  })
+
+  ipcMain.handle('obsidian:write-profile', (_e, vaultPath, profile) => {
+    return writeProfileNote(vaultPath, profile)
+  })
+
+  ipcMain.handle('obsidian:write-finding', (_e, vaultPath, finding, profile) => {
+    return writeFindingNote(vaultPath, finding, profile)
   })
 }

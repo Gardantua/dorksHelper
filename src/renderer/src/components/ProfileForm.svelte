@@ -10,25 +10,56 @@
     ? { ...profile, emails: [...profile.emails], phones: [...profile.phones], usernames: [...profile.usernames], aliases: [...profile.aliases] }
     : { type: 'person', name: '', aliases: [], emails: [], phones: [], usernames: [], company: '', location: '', domain: '', notes: '' }
 
-  let emailInput = ''
-  let phoneInput = ''
+  const USERNAME_PLATFORMS = [
+    { value: 'all',       label: 'Genel' },
+    { value: 'instagram', label: 'Instagram' },
+    { value: 'twitter',   label: 'X / Twitter' },
+    { value: 'facebook',  label: 'Facebook' },
+    { value: 'linkedin',  label: 'LinkedIn' },
+    { value: 'tiktok',    label: 'TikTok' },
+    { value: 'youtube',   label: 'YouTube' },
+    { value: 'reddit',    label: 'Reddit' },
+    { value: 'telegram',  label: 'Telegram' },
+    { value: 'github',    label: 'GitHub' },
+    { value: 'gitlab',    label: 'GitLab' }
+  ]
+
+  let emailInput    = ''
+  let phoneInput    = ''
   let usernameInput = ''
+  let usernamePlatform = 'all'
   let aliasInput    = ''
   let saving = false
   let error  = ''
 
   function addToList(listKey, inputRef) {
     const val = inputRef.trim()
-    if (val && !form[listKey].includes(val)) {
+    if (!val) return
+    if (listKey === 'usernames') {
+      const exists = form.usernames.some(u =>
+        (typeof u === 'object' ? u.value : u) === val
+      )
+      if (!exists) {
+        form.usernames = [...form.usernames, { value: val, platform: usernamePlatform }]
+      }
+      usernameInput = ''
+      return
+    }
+    if (!form[listKey].includes(val)) {
       form[listKey] = [...form[listKey], val]
     }
-    if (listKey === 'emails')    emailInput    = ''
-    if (listKey === 'phones')    phoneInput    = ''
-    if (listKey === 'usernames') usernameInput = ''
-    if (listKey === 'aliases')   aliasInput    = ''
+    if (listKey === 'emails')  emailInput  = ''
+    if (listKey === 'phones')  phoneInput  = ''
+    if (listKey === 'aliases') aliasInput  = ''
   }
 
   function removeFromList(listKey, val) {
+    if (listKey === 'usernames') {
+      form.usernames = form.usernames.filter(u =>
+        (typeof u === 'object' ? u.value : u) !== (typeof val === 'object' ? val.value : val)
+      )
+      return
+    }
     form[listKey] = form[listKey].filter(v => v !== val)
   }
 
@@ -37,6 +68,10 @@
       e.preventDefault()
       addToList(listKey, inputRef)
     }
+  }
+
+  function platformLabel(p) {
+    return USERNAME_PLATFORMS.find(x => x.value === p)?.label ?? p
   }
 
   async function save() {
@@ -122,14 +157,25 @@
           <input
             id="username-input"
             bind:value={usernameInput}
-            placeholder="Kullanıcı adı ekle ve Enter'a bas"
+            placeholder="Kullanıcı adı"
             on:keydown={(e) => keydown(e, 'usernames', usernameInput)}
           />
+          <select bind:value={usernamePlatform} class="platform-select">
+            {#each USERNAME_PLATFORMS as p}
+              <option value={p.value}>{p.label}</option>
+            {/each}
+          </select>
           <button class="btn-ghost add-btn" on:click={() => addToList('usernames', usernameInput)}>+</button>
         </div>
         <div class="chips">
           {#each form.usernames as u}
-            <span class="chip">{u}<button on:click={() => removeFromList('usernames', u)}>✕</button></span>
+            {@const uval = typeof u === 'object' ? u.value : u}
+            {@const uplat = typeof u === 'object' ? u.platform : 'all'}
+            <span class="chip">
+              {uval}
+              {#if uplat !== 'all'}<span class="chip-platform"> · {platformLabel(uplat)}</span>{/if}
+              <button on:click={() => removeFromList('usernames', u)}>✕</button>
+            </span>
           {/each}
         </div>
       </div>
@@ -234,6 +280,18 @@
   }
 
   .chip button:hover { color: var(--danger); }
+
+  .chip-platform {
+    color: var(--accent-h);
+    font-size: 11px;
+  }
+
+  .platform-select {
+    flex-shrink: 0;
+    width: auto;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
 
   .error {
     color: var(--danger);

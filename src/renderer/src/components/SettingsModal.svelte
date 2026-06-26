@@ -30,9 +30,9 @@
 
     <div class="modal-body">
       <div class="field">
-        <label>Obsidian Vault Klasörü</label>
+        <label for="vault-path-input">Obsidian Vault Klasörü</label>
         <div class="path-input">
-          <input bind:value={vaultPath} placeholder="Vault klasör yolunu seçin..." readonly />
+          <input id="vault-path-input" bind:value={vaultPath} placeholder="Vault klasör yolunu seçin..." readonly />
           <button class="btn-ghost browse-btn" on:click={selectFolder}>Gözat</button>
         </div>
         <span class="field-hint">

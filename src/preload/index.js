@@ -21,5 +21,9 @@ contextBridge.exposeInMainWorld('api', {
   },
   dialog: {
     selectFolder: () => ipcRenderer.invoke('dialog:select-folder')
+  },
+  obsidian: {
+    writeProfile: (vaultPath, profile)          => ipcRenderer.invoke('obsidian:write-profile', vaultPath, profile),
+    writeFinding: (vaultPath, finding, profile) => ipcRenderer.invoke('obsidian:write-finding', vaultPath, finding, profile)
   }
 })

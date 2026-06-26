@@ -1,10 +1,13 @@
 <script>
-  import { queriesWithState, stats, sessionActions } from '../stores/session'
+  import { queriesWithState, stats, sessionActions, findings } from '../stores/session'
   import { activeProfile } from '../stores/profile'
   import QueryItem from './QueryItem.svelte'
+  import FindingsPanel from './FindingsPanel.svelte'
   import { createEventDispatcher } from 'svelte'
 
   const dispatch = createEventDispatcher()
+
+  let activeTab = 'queries'
 
   const CATEGORY_ORDER = ['identity', 'social', 'career', 'documents', 'credentials', 'technical', 'media', 'news', 'archive']
 
@@ -82,7 +85,8 @@
         <span class="field-chip">✉ {$activeProfile.emails[0]}{$activeProfile.emails.length > 1 ? ` +${$activeProfile.emails.length - 1}` : ''}</span>
       {/if}
       {#if $activeProfile?.usernames?.length}
-        <span class="field-chip">@ {$activeProfile.usernames[0]}{$activeProfile.usernames.length > 1 ? ` +${$activeProfile.usernames.length - 1}` : ''}</span>
+        {@const first = $activeProfile.usernames[0]}
+        <span class="field-chip">@ {typeof first === 'object' ? first.value : first}{$activeProfile.usernames.length > 1 ? ` +${$activeProfile.usernames.length - 1}` : ''}</span>
       {/if}
       {#if $activeProfile?.company}
         <span class="field-chip">🏢 {$activeProfile.company}</span>
@@ -93,53 +97,66 @@
     </div>
   </div>
 
-  <div class="filters">
-    <div class="filter-group">
-      <span class="filter-label">Öncelik:</span>
-      <button class="filter-btn" class:active={filterPriority === 'all'}    on:click={() => filterPriority = 'all'}>Tümü</button>
-      <button class="filter-btn" class:active={filterPriority === 'high'}   on:click={() => filterPriority = 'high'}>Yüksek</button>
-      <button class="filter-btn" class:active={filterPriority === 'medium'} on:click={() => filterPriority = 'medium'}>Orta</button>
-      <button class="filter-btn" class:active={filterPriority === 'low'}    on:click={() => filterPriority = 'low'}>Düşük</button>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">Durum:</span>
-      <button class="filter-btn" class:active={filterState === 'all'}     on:click={() => filterState = 'all'}>Tümü</button>
-      <button class="filter-btn" class:active={filterState === 'active'}  on:click={() => filterState = 'active'}>Aktif</button>
-      <button class="filter-btn" class:active={filterState === 'pending'} on:click={() => filterState = 'pending'}>Bekleyen</button>
-      <button class="filter-btn" class:active={filterState === 'found'}   on:click={() => filterState = 'found'}>Bulgu</button>
-    </div>
+  <div class="tabs">
+    <button class="tab" class:active={activeTab === 'queries'} on:click={() => activeTab = 'queries'}>
+      Sorgular <span class="tab-count">{$stats.active}/{$stats.total}</span>
+    </button>
+    <button class="tab" class:active={activeTab === 'findings'} on:click={() => activeTab = 'findings'}>
+      Bulgular <span class="tab-count">{$findings.length}</span>
+    </button>
   </div>
 
-  <div class="query-groups">
-    {#each displayGroups as group (group.cat)}
-      <div class="category-group">
-        <button class="category-header" on:click={() => toggle(group.cat)}>
-          <span class="collapse-icon">{collapsed[group.cat] ? '▶' : '▼'}</span>
-          <span class="category-label">{group.label}</span>
-          <span class="category-count">{group.queries.filter(q => q.active).length} / {group.queries.length}</span>
-        </button>
-
-        {#if !collapsed[group.cat]}
-          <div class="category-queries">
-            {#each group.queries as query (query.id)}
-              <QueryItem
-                {query}
-                on:open={handleOpen}
-                on:markEmpty={handleMarkEmpty}
-                on:markFinding={handleMarkFinding}
-              />
-            {/each}
-          </div>
-        {/if}
+  {#if activeTab === 'queries'}
+    <div class="filters">
+      <div class="filter-group">
+        <span class="filter-label">Öncelik:</span>
+        <button class="filter-btn" class:active={filterPriority === 'all'}    on:click={() => filterPriority = 'all'}>Tümü</button>
+        <button class="filter-btn" class:active={filterPriority === 'high'}   on:click={() => filterPriority = 'high'}>Yüksek</button>
+        <button class="filter-btn" class:active={filterPriority === 'medium'} on:click={() => filterPriority = 'medium'}>Orta</button>
+        <button class="filter-btn" class:active={filterPriority === 'low'}    on:click={() => filterPriority = 'low'}>Düşük</button>
       </div>
-    {/each}
-
-    {#if displayGroups.length === 0}
-      <div class="empty-state">
-        <p>Bu filtreyle gösterilecek sorgu yok.</p>
+      <div class="filter-group">
+        <span class="filter-label">Durum:</span>
+        <button class="filter-btn" class:active={filterState === 'all'}     on:click={() => filterState = 'all'}>Tümü</button>
+        <button class="filter-btn" class:active={filterState === 'active'}  on:click={() => filterState = 'active'}>Aktif</button>
+        <button class="filter-btn" class:active={filterState === 'pending'} on:click={() => filterState = 'pending'}>Bekleyen</button>
+        <button class="filter-btn" class:active={filterState === 'found'}   on:click={() => filterState = 'found'}>Bulgu</button>
       </div>
-    {/if}
-  </div>
+    </div>
+
+    <div class="query-groups">
+      {#each displayGroups as group (group.cat)}
+        <div class="category-group">
+          <button class="category-header" on:click={() => toggle(group.cat)}>
+            <span class="collapse-icon">{collapsed[group.cat] ? '▶' : '▼'}</span>
+            <span class="category-label">{group.label}</span>
+            <span class="category-count">{group.queries.filter(q => q.active).length} / {group.queries.length}</span>
+          </button>
+
+          {#if !collapsed[group.cat]}
+            <div class="category-queries">
+              {#each group.queries as query (query.id)}
+                <QueryItem
+                  {query}
+                  on:open={handleOpen}
+                  on:markEmpty={handleMarkEmpty}
+                  on:markFinding={handleMarkFinding}
+                />
+              {/each}
+            </div>
+          {/if}
+        </div>
+      {/each}
+
+      {#if displayGroups.length === 0}
+        <div class="empty-state">
+          <p>Bu filtreyle gösterilecek sorgu yok.</p>
+        </div>
+      {/if}
+    </div>
+  {:else}
+    <FindingsPanel findings={$findings} />
+  {/if}
 </div>
 
 <style>
@@ -203,6 +220,39 @@
     color: var(--text-dim);
   }
 
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    padding: 0 16px;
+  }
+
+  .tab {
+    background: transparent;
+    color: var(--text-muted);
+    padding: 10px 14px;
+    font-size: 13px;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  .tab-count {
+    font-size: 11px;
+    background: var(--surface2);
+    padding: 1px 6px;
+    border-radius: 10px;
+    color: var(--text-muted);
+  }
+
+  .tab.active .tab-count { background: rgba(99,102,241,0.2); color: var(--accent-h); }
+
   .filters {
     display: flex;
     gap: 16px;
@@ -240,6 +290,7 @@
 
   .query-groups {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     padding: 8px 12px;
     display: flex;

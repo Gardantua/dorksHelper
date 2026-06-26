@@ -7,18 +7,30 @@
 
   const dispatch = createEventDispatcher()
 
-  let url        = ''
-  let notes      = ''
-  let confidence = 'high'
+  const TYPES = [
+    { value: 'account',  label: 'Hesap / Profil',   icon: '👤', hint: 'Sosyal medya hesabı, web profili' },
+    { value: 'contact',  label: 'İletişim',          icon: '📧', hint: 'Email, telefon, adres' },
+    { value: 'post',     label: 'Gönderi',           icon: '📝', hint: 'Önemli tweet, post, yorum' },
+    { value: 'news',     label: 'Haber',             icon: '📰', hint: 'Gazete, haber sitesi' },
+    { value: 'document', label: 'Belge',             icon: '📄', hint: 'CV, resmi belge, PDF' },
+    { value: 'leak',     label: 'Sızıntı',           icon: '🔓', hint: 'Credential, veri sızıntısı' },
+    { value: 'relation', label: 'İlişki',            icon: '🔗', hint: 'Başka kişi/kurumla bağlantı' },
+    { value: 'other',    label: 'Diğer',             icon: '📌', hint: '' }
+  ]
+
+  let findingType = 'account'
+  let title       = ''
+  let url         = ''
+  let notes       = ''
+  let confidence  = 'high'
   let addToProfile = false
   let saving = false
 
-  let newName     = $activeProfile?.name ?? ''
-  let newEmails   = ''
+  let newEmails    = ''
   let newUsernames = ''
-  let newPhones   = ''
-  let newCompany  = $activeProfile?.company ?? ''
-  let newLocation = $activeProfile?.location ?? ''
+  let newPhones    = ''
+  let newCompany   = $activeProfile?.company ?? ''
+  let newLocation  = $activeProfile?.location ?? ''
 
   async function save() {
     saving = true
@@ -27,6 +39,8 @@
         queryId:    query.id,
         queryLabel: query.label,
         platform:   query.platformLabel,
+        type:       findingType,
+        title,
         url,
         notes,
         confidence
@@ -43,9 +57,11 @@
         }
         if (newUsernames.trim()) {
           const additional = newUsernames.split(',').map(u => u.trim()).filter(Boolean)
-          const current    = $activeProfile?.usernames ?? []
-          const merged     = [...new Set([...current, ...additional])]
-          if (merged.length !== current.length) newProfileData.usernames = merged
+            .map(v => ({ value: v, platform: 'all' }))
+          const current = $activeProfile?.usernames ?? []
+          const existingValues = current.map(u => typeof u === 'object' ? u.value : u)
+          const toAdd = additional.filter(u => !existingValues.includes(u.value))
+          if (toAdd.length > 0) newProfileData.usernames = [...current, ...toAdd]
         }
         if (newPhones.trim()) {
           const additional = newPhones.split(',').map(p => p.trim()).filter(Boolean)
@@ -69,7 +85,7 @@
 <div class="modal-overlay" on:click|self={() => dispatch('close')}>
   <div class="modal" role="dialog" aria-modal="true">
     <div class="modal-header">
-      <h2>Bulgu İşaretle</h2>
+      <h2>Bulgu Ekle</h2>
       <button class="close-btn" on:click={() => dispatch('close')}>✕</button>
     </div>
 
@@ -80,13 +96,35 @@
       </div>
 
       <div class="field">
+        <span class="field-group-label">Bulgu Tipi</span>
+        <div class="type-grid">
+          {#each TYPES as t}
+            <button
+              class="type-btn"
+              class:selected={findingType === t.value}
+              on:click={() => findingType = t.value}
+              title={t.hint}
+            >
+              <span class="type-icon">{t.icon}</span>
+              <span class="type-label">{t.label}</span>
+            </button>
+          {/each}
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="finding-title">Başlık / İsim</label>
+        <input id="finding-title" bind:value={title} placeholder="Hesap adı, makale başlığı, kişi ismi..." />
+      </div>
+
+      <div class="field">
         <label for="finding-url">Kaynak URL</label>
         <input id="finding-url" bind:value={url} placeholder="https://..." />
       </div>
 
       <div class="field">
         <label for="finding-notes">Not</label>
-        <textarea id="finding-notes" bind:value={notes} rows="3" placeholder="Bu bulguda ne buldun?" />
+        <textarea id="finding-notes" bind:value={notes} rows="2" placeholder="Kısa açıklama..." />
       </div>
 
       <div class="field">
@@ -117,25 +155,25 @@
       {#if addToProfile}
         <div class="new-data">
           <div class="field">
-            <label>Yeni Email(ler) <span class="hint">(virgülle ayır)</span></label>
-            <input bind:value={newEmails} placeholder="email1@x.com, email2@y.com" />
+            <label for="new-emails">Yeni Email(ler) <span class="hint">(virgülle ayır)</span></label>
+            <input id="new-emails" bind:value={newEmails} placeholder="email1@x.com, email2@y.com" />
           </div>
           <div class="field">
-            <label>Yeni Kullanıcı Adı(ları) <span class="hint">(virgülle ayır)</span></label>
-            <input bind:value={newUsernames} placeholder="user1, user2" />
+            <label for="new-usernames">Yeni Kullanıcı Adı(ları) <span class="hint">(virgülle ayır)</span></label>
+            <input id="new-usernames" bind:value={newUsernames} placeholder="user1, user2" />
           </div>
           <div class="field">
-            <label>Yeni Telefon(lar) <span class="hint">(virgülle ayır)</span></label>
-            <input bind:value={newPhones} placeholder="+90..." />
+            <label for="new-phones">Yeni Telefon(lar) <span class="hint">(virgülle ayır)</span></label>
+            <input id="new-phones" bind:value={newPhones} placeholder="+90..." />
           </div>
           <div class="row">
             <div class="field" style="flex:1">
-              <label>Şirket / Kurum</label>
-              <input bind:value={newCompany} />
+              <label for="new-company">Şirket / Kurum</label>
+              <input id="new-company" bind:value={newCompany} />
             </div>
             <div class="field" style="flex:1">
-              <label>Lokasyon</label>
-              <input bind:value={newLocation} />
+              <label for="new-location">Lokasyon</label>
+              <input id="new-location" bind:value={newLocation} />
             </div>
           </div>
         </div>
@@ -169,8 +207,39 @@
     display: block;
     font-size: 12px;
     color: var(--text-dim);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
+
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .type-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+
+  .type-btn:hover { border-color: var(--accent); color: var(--text); }
+  .type-btn.selected {
+    background: rgba(99,102,241,0.15);
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  .type-icon { font-size: 18px; }
+  .type-label { text-align: center; line-height: 1.2; }
 
   .confidence-group {
     display: flex;

@@ -1,5 +1,6 @@
-import { writable, derived } from 'svelte/store'
+import { writable, derived, get } from 'svelte/store'
 import { activeProfile, profileActions } from './profile'
+import { settings } from './settings'
 
 export const queries      = writable([])
 export const queryStates  = writable({})  // { [queryId]: 'pending'|'opened'|'found'|'empty' }
@@ -89,10 +90,23 @@ export const sessionActions = {
 
     await persist(currentProfileId)
 
-    if (newProfileData && Object.keys(newProfileData).length > 0) {
-      const profile = await window.api.profiles.load()
-        .then(list => list.find(p => p.id === currentProfileId))
-      if (profile) {
+    const needsRefresh = newProfileData && Object.keys(newProfileData).length > 0
+    const vault = get(settings).vaultPath
+
+    if (vault || needsRefresh) {
+      const profileList = await window.api.profiles.load()
+      const profile = profileList.find(p => p.id === currentProfileId)
+
+      if (vault && profile) {
+        try {
+          await window.api.obsidian.writeFinding(vault, entry, profile)
+          await window.api.obsidian.writeProfile(vault, profile)
+        } catch (err) {
+          console.error('Obsidian yazma hatası:', err)
+        }
+      }
+
+      if (needsRefresh && profile) {
         const generated = await window.api.queries.generate(profile)
         queries.set(generated)
       }
